@@ -1,5 +1,7 @@
 -- XDP TAR PRJ1 --
- TODO:
-  - Simple XDP_DROP
-  - Showcase XDP_TX / XDP_REDIRECT
+ 
+ common/ and libbpf/ were extracted from xdp-project/xdp-tutorial -> (https://github.com/xdp-project/xdp-tutorial)
+
+ Makefile from p1/ was updated respectively
+
 --	*	--
