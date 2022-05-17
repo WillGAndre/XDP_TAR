@@ -1,0 +1,13 @@
+cargo:rerun-if-changed=include/
+cargo:rerun-if-changed=include/bpf_helper_defs.h
+cargo:rerun-if-changed=include/bpf_helpers.h
+cargo:rerun-if-changed=include/bpf_iter.h
+cargo:rerun-if-changed=include/redbpf_helpers.h
+cargo:rerun-if-changed=include/vmlinux_supplement.h
+cargo:rerun-if-changed=include/xdp.h
+cargo:rerun-if-env-changed=KERNEL_SOURCE
+cargo:rerun-if-env-changed=KERNEL_VERSION
+cargo:rerun-if-env-changed=REDBPF_VMLINUX
+[2mMay 17 20:15:01.014[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with pre-installed kernel headers
+[2mMay 17 20:15:01.014[0m [33m WARN[0m build_script_build: error on generate_bindings_kernel_headers: error on Builder::get_builder_kernel_headers: kernel headers not found
+[2mMay 17 20:15:01.014[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with vmlinux

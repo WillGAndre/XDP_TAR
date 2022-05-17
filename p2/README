@@ -1,0 +1,51 @@
+---
+
+Fedora deps:
+ sudo dnf install -y bison cmake ethtool flex git iperf libstdc++-static \
+  python-netaddr python-pip gcc gcc-c++ make zlib-devel \
+  elfutils-libelf-devel python-cachetools
+
+Install binary clang:
+ sudo dnf install -y clang clang-devel llvm llvm-devel llvm-static ncurses-devel
+
+ > Install kernel-headers if needed <
+
+---
+
+INSTALL BPF:
+ sudo cargo install cargo-bpf --no-default-features --features=llvm13,command-line
+
+BUILD / GEN ELF:
+ sudo cargo bpf build 
+
+LOAD XDP PROG:
+ sudo cargo bpf load -i enp0s9 target/bpf/programs/fw/fw.elf
+
+---
+
+DEPS REFS:
+ https://github.com/iovisor/bcc/blob/master/INSTALL.md#ubuntu---source
+
+RUST RELATED:
+ https://pub.gctl.io/xdp-ebpf-firewall-in-rust/
+ https://docs.rs/redbpf-probes/latest/redbpf_probes/xdp/index.html
+ https://docs.rs/redbpf-probes/latest/redbpf_probes/xdp/struct.XdpContext.html
+ https://bytemeta.vip/index.php/repo/foniod/redbpf/issues/315
+ https://blog.redsift.com/labs/writing-bpf-code-in-rust/
+ https://lib.rs/crates/cargo-bpf
+ https://github.com/foniod/redbpf/blob/HEAD/TUTORIAL.md
+ https://github.com/foniod/redbpf/issues/213
+ https://doc.bccnsoft.com/docs/rust-1.36.0-docs-html/edition-guide/rust-2018/rustup-for-managing-rust-versions.html
+
+---
+
+GOLANG RELATED:
+ https://github.com/dropbox/goebpf/blob/master/examples/xdp/bpf_redirect_map/ebpf_prog/xdp.c
+ https://github.com/dropbox/goebpf/blob/master/examples/xdp/bpf_redirect_map/ebpf_prog/xdp.c
+ 
+---
+
+FIREWALL XDP:
+ https://github.com/gamemann/XDP-Firewall
+
+---
