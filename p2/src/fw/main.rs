@@ -17,6 +17,7 @@ struct Addr {
     pub port: u16,
 }
 
+// TODO: Add cmp method
 impl Addr {
     pub fn new(addr: [u8; 6], port: u16) -> Self {
         Self {
@@ -30,6 +31,10 @@ impl Addr {
 // And, also drop all TCP packets destined to port 80.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
+    
+    // TODO: Get from config
+    // let blacklist: [Addr; 2];
+
     if let Ok(ip_protocol) = get_ip_protocol(&ctx) {
         match ip_protocol as u32 {
             IPPROTO_UDP => return Ok(UDP_XDP_DROP), // drop it on the floor
@@ -50,7 +55,8 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
                     h_addr = unsafe { (*eth_clone).h_dest };
                 }
 
-                let _addr = Addr::new(h_addr, port);
+                let addr = Addr::new(h_addr, port);
+            
             }
             _ => return Ok(XDP_PASS), // pass it up the protocol stack
         }

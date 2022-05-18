@@ -1,4 +1,4 @@
-cargo:rustc-link-search=native=/home/will/Desktop/xdp-ebpf-fw/target/bpf/release/build/bpf-sys-c6180fde8bc228e3/out
+cargo:rustc-link-search=native=/home/will/Desktop/work/XDP_TAR/p2/target/bpf/release/build/bpf-sys-c6180fde8bc228e3/out
 cargo:rustc-link-lib=static=bpf
 cargo:rustc-link-lib=elf
 cargo:rustc-link-lib=z
@@ -77,23 +77,6 @@ cargo:rerun-if-changed=libbpf/src/libbpf.pc.template
 cargo:rerun-if-changed=bpfsys-musl.h
 cargo:rerun-if-changed=libbpf_xdp.h
 make: Entering directory '/root/.cargo/registry/src/github.com-1ecc6299db9ec823/bpf-sys-2.3.0/libbpf/src'
-  MKDIR    staticobjs
-  CC       bpf.o
-  CC       btf.o
-  CC       libbpf.o
-  CC       libbpf_errno.o
-  CC       netlink.o
-  CC       nlattr.o
-  CC       str_error.o
-  CC       libbpf_probes.o
-  CC       bpf_prog_linfo.o
-  CC       xsk.o
-  CC       btf_dump.o
-  CC       hashmap.o
-  CC       ringbuf.o
-  CC       strset.o
-  CC       linker.o
-  CC       gen_loader.o
   AR       libbpf.a
   INSTALL  bpf.h libbpf.h btf.h libbpf_common.h libbpf_legacy.h xsk.h bpf_helpers.h bpf_helper_defs.h bpf_tracing.h bpf_endian.h bpf_core_read.h skel_internal.h
   INSTALL  libbpf.pc
