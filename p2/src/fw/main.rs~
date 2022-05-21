@@ -15,29 +15,76 @@ const UDP_XDP_DROP: XdpAction = XdpAction::Drop;
 const XDP_PASS: XdpAction = XdpAction::Pass;
 const XDP_DROP: XdpAction = XdpAction::Drop;
 
+pub struct Addr {
+    pub h_addr: [u8; 6],
+    pub port: u16,
+}
+
+impl Addr {
+    pub fn new(addr: [u8; 6], port: u16) -> Self {
+        Self {
+            h_addr: addr,
+            port: port,
+        }
+    }
+
+    pub fn get_port(&self) -> u16 {
+        self.port.clone()
+    }
+}
+
 // * --- *
 
 pub const LIST_SIZE: usize = 3;
+
+pub fn read_config_ports() -> [u16; LIST_SIZE] {
+    let mut ports: [u16; LIST_SIZE] = Default::default();
+    let mut ports_index: usize = 0;
+    let config_str = include_str!("config-block-port");
+    let stm = config_str.split(':');
+    
+    for port_str in stm {
+        if ports_index < LIST_SIZE {
+            let port = port_str.parse::<u16>().unwrap();
+            ports[ports_index] = port;
+            ports_index += 1;
+        } else {
+            break
+        }
+    }
+
+    ports
+}
 
 // XDP/eBPF based IP-layer firewall to drop all UDP packets.
 // And, also drop all TCP packets destined to port 80.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
-    // let cmd = include!("config");
-    let cmds: [u32;LIST_SIZE] = include!("test");
+    // let ports: [u16; LIST_SIZE] = read_config_ports();
     let mut index = 0;
 
+    let cmd = include!("config");
+    let test = try!(include!("test"));
+
+    /*
+    let config_str = include_str!("config-block-port-tcp");
+    let mut stm = config_str.split(':');
+    const MAX_SIZE: usize = 5;
+    let mut port_blk: [u16; MAX_SIZE] = [0u16; MAX_SIZE];
+    let mut index = 0;
+    for cmd in stm {
+        if cmd.parse::<u16>().unwrap() == 0 {
+        
+        } else {
+            port_blk[index] = cmd.parse::<u16>().unwrap();
+            index += 1;
+        }
+    }
+    */
+    
     if let Ok(ip_protocol) = get_ip_protocol(&ctx) {
-        /*
         if (ip_protocol as u32) == cmd {
             return Ok(XDP_DROP)
-        }
-        */
-        while index < LIST_SIZE {
-            if (ip_protocol as u32) == cmds[index] {
-                return Ok(XDP_DROP)
-            }
-            index += 1;
         }
         match ip_protocol as u32 {
             /*
@@ -50,12 +97,19 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
             */
             IPPROTO_UDP => return Ok(XDP_PASS),
             IPPROTO_TCP => {
+                
+                //let mut h_addr: [u8; 6] = [0; 6];
+                // let port: u16; 
+
+                
+
                 /*
                 if let Ok(eth) = ctx.eth() {
                     let eth_clone = eth.clone();
                     h_addr = unsafe { (*eth_clone).h_dest };
                 }
                 */
+                //let _addr = Addr::new(h_addr, port);
                 return Ok(XDP_PASS)
             }
             _ => return Ok(XDP_PASS), // pass it up the protocol stack
