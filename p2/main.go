@@ -21,7 +21,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		if scanner.Text() == "1" {
-			path := filepath.Join("..", "src", "fw", "block-proto")
+			path := filepath.Join("src", "fw", "block-proto")
 			os.Truncate(path, 0)
 			f, err := os.Create(path)
 
