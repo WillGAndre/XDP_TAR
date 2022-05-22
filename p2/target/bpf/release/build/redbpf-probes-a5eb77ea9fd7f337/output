@@ -8,4 +8,4 @@ cargo:rerun-if-changed=include/xdp.h
 cargo:rerun-if-env-changed=KERNEL_SOURCE
 cargo:rerun-if-env-changed=KERNEL_VERSION
 cargo:rerun-if-env-changed=REDBPF_VMLINUX
-[2mMay 18 23:24:42.378[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with pre-installed kernel headers
+[2mMay 22 20:09:40.595[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with pre-installed kernel headers

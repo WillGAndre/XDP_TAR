@@ -21,7 +21,7 @@ const XDP_DROP: XdpAction = XdpAction::Drop;
 // And, also drop all TCP packets destined to port 80.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
-    let cmds = include!("test");
+    let cmds = include!("block-proto");
 
     if let Ok(ip_protocol) = get_ip_protocol(&ctx) {
         for cmd in cmds {
