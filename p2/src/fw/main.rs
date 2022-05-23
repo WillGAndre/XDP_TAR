@@ -4,6 +4,7 @@
 use core::fmt::Error;
 use core::str;
 use core::str::*;
+use core::convert::TryInto;
 use cty::*;
 use redbpf_probes::xdp::prelude::*;
 use redbpf_probes::bindings::*;
@@ -21,6 +22,7 @@ const XDP_DROP: XdpAction = XdpAction::Drop;
 // And, also drop all TCP packets destined to port 80.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
+    /*
     let cmds = include!("block-proto");
 
     if let Ok(ip_protocol) = get_ip_protocol(&ctx) {
@@ -30,6 +32,16 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
             }
         }
     }
+    */
+
+    // 142.250.184.174
+    let ip: u32 = 2398795950_u32.to_be();
+    if let Ok(ip_saddr) = get_ip_saddr(&ctx) {
+        if ip_saddr == ip {
+            return Ok(XDP_DROP)
+        }
+    }
+
     return Ok(XDP_PASS);
 }
 
@@ -42,4 +54,13 @@ fn get_ip_protocol(ctx: &XdpContext) -> Result<u32, Error> {
     }
     // Anything above `255` is reserved.
     return Ok(0x10000);
+}
+
+fn get_ip_saddr(ctx: &XdpContext) -> Result<u32, Error> {
+    if let Ok(ip) = ctx.ip() {
+        unsafe {
+            return Ok((*ip).saddr as u32);
+        }
+    }
+    return Ok(0);
 }
