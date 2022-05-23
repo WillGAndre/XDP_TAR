@@ -35,11 +35,16 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
     */
 
     // 142.250.184.174
-    let ip: u32 = 2398795950_u32.to_be();
+    //let ip: u32 = 2398795950_u32.to_be();
+
+    let ips = include!("block-ip");
+
     if let Ok(ip_saddr) = get_ip_saddr(&ctx) {
-        if ip_saddr == ip {
-            return Ok(XDP_DROP)
-        }
+        for ip in ips{
+            if ip_saddr == ip.to_be() {
+                return Ok(XDP_DROP)
+            }
+        }  
     }
 
     return Ok(XDP_PASS);
