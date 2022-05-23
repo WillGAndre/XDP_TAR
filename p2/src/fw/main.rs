@@ -19,32 +19,26 @@ const XDP_DROP: XdpAction = XdpAction::Drop;
 // * --- *
 
 // XDP/eBPF based IP-layer firewall to drop all UDP packets.
-// And, also drop all TCP packets destined to port 80.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
-    /*
-    let cmds = include!("block-proto");
-
-    if let Ok(ip_protocol) = get_ip_protocol(&ctx) {
-        for cmd in cmds {
-            if (ip_protocol as u32) == cmd {
-                return Ok(XDP_DROP)
-            }
-        }
-    }
-    */
-
-    // 142.250.184.174
-    //let ip: u32 = 2398795950_u32.to_be();
-
+    // Blacklist ips
     let ips = include!("block-ip");
-
     if let Ok(ip_saddr) = get_ip_saddr(&ctx) {
         for ip in ips{
             if ip_saddr == ip.to_be() {
                 return Ok(XDP_DROP)
             }
         }  
+    }
+
+    // Block Protocols
+    let cmds = include!("block-proto");
+    if let Ok(ip_protocol) = get_ip_protocol(&ctx) {
+        for cmd in cmds {
+            if (ip_protocol as u32) == cmd {
+                return Ok(XDP_DROP)
+            }
+        }
     }
 
     return Ok(XDP_PASS);
@@ -67,5 +61,5 @@ fn get_ip_saddr(ctx: &XdpContext) -> Result<u32, Error> {
             return Ok((*ip).saddr as u32);
         }
     }
-    return Ok(0);
+    return Ok(0x10000);
 }
