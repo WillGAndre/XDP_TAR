@@ -11,8 +11,6 @@ use redbpf_probes::bindings::*;
 
 program!(0xFFFFFFFE, "GPL");
 
-const _TCP_XDP_DROP: XdpAction = XdpAction::Drop;
-const _UDP_XDP_DROP: XdpAction = XdpAction::Drop;
 const XDP_PASS: XdpAction = XdpAction::Pass;
 const XDP_DROP: XdpAction = XdpAction::Drop;
 
@@ -24,11 +22,21 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
     // Blacklist ips
     let ips = include!("block-ip");
     if let Ok(ip_saddr) = get_ip_saddr(&ctx) {
-        for ip in ips{
+        for ip in ips {
             if ip_saddr == ip.to_be() {
                 return Ok(XDP_DROP)
             }
         }  
+    }
+
+    // Blacklist ports
+    let ports = include!("block-port");
+    if let Ok(sport) = get_sport(&ctx) {
+        for port in ports {
+            if port == sport {
+                return Ok(XDP_DROP)
+            }
+        }
     }
 
     // Block Protocols
@@ -62,4 +70,11 @@ fn get_ip_saddr(ctx: &XdpContext) -> Result<u32, Error> {
         }
     }
     return Ok(0x10000);
+}
+
+fn get_sport(ctx: &XdpContext) -> Result<u16, Error> {
+    if let Ok(transport) = ctx.transport() {
+        return Ok(transport.source)
+    }
+    return Ok(49150)
 }

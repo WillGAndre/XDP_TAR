@@ -22,6 +22,3 @@ path = "src/lib.rs"
 name = "fw"
 path = "src/fw/main.rs"
 required-features = ["probes"]
-
-[env]
-test = { value = "config", force = true}

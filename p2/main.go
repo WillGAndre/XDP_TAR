@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // IPv4 integer conv source: http://www.aboutmyip.com/AboutMyXApp/IP2Integer.jsp?ipAddress=142.250.184.174
@@ -18,6 +18,7 @@ func main() {
 		"\t\t -> Protocols must follow nomenclature as stated in: redbpf_probes::bindings::IPPROTO_\n" +
 		"\t[2] Block by ipv4" +
 		"\t\t -> Ips must follow CIDR notation\n" +
+		"\t[3] Block by port\n" +
 		"" +
 		"\n\t[c] clear\n" +
 		"\t[q] quit\n" +
@@ -60,10 +61,10 @@ func main() {
 					break
 				}
 			}
-			
+
 			fmt.Print(boot)
 			// break
-		} 
+		}
 		if scanner.Text() == "2" {
 			path = filepath.Join("src", "fw", "block-ip")
 			os.Truncate(path, 0)
@@ -88,17 +89,17 @@ func main() {
 						var ip_int int
 						for j, oct := range oct_split {
 							num_oct, err := strconv.Atoi(oct)
-							
+
 							if err != nil {
 								log.Fatal(err)
 							}
 
 							if j == 0 {
-								ip_int += ( num_oct * 16777216 ) 
+								ip_int += (num_oct * 16777216)
 							} else if j == 1 {
-								ip_int += ( num_oct * 65536 )
+								ip_int += (num_oct * 65536)
 							} else if j == 2 {
-								ip_int += ( num_oct * 256 )
+								ip_int += (num_oct * 256)
 							} else {
 								ip_int += num_oct
 							}
@@ -117,12 +118,46 @@ func main() {
 			fmt.Print(boot)
 			// break
 		}
-		if scanner.Text() == "c" {
+		if scanner.Text() == "3" {
+			path = filepath.Join("src", "fw", "block-port")
+			os.Truncate(path, 0)
+			f, err := os.Create(path)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			defer f.Close()
+
+			text = "Set port:\n" +
+				"\tex: 443 80 8080"
+			fmt.Println(text)
+			for scanner.Scan() {
+				if scanner.Text() != "\n" {
+					f_res := "["
+					ports := scanner.Text()
+					ports_split := strings.Split(ports, " ")
+					for i, port := range ports_split {
+						f_res += port
+						if i+1 != len(ports_split) {
+							f_res += ", "
+						}
+					}
+					f_res += "]"
+					f.WriteString(f_res)
+					break
+				}
+			}
+
+			fmt.Print(boot)
+		} else if scanner.Text() == "c" {
 			path = filepath.Join("src", "fw", "block-proto")
 			clear(path, 1)
 			path = filepath.Join("src", "fw", "block-ip")
-                        clear(path, 2)
-			
+			clear(path, 2)
+			path = filepath.Join("src", "fw", "block-port")
+			clear(path, 3)
+
 			fmt.Print(boot)
 		}
 		if scanner.Text() == "q" {
@@ -136,15 +171,17 @@ func clear(path string, opt int) {
 
 	f, err := os.Create(path)
 
-        if err != nil {
-        	log.Fatal(err)
-        }
+	if err != nil {
+		log.Fatal(err)
+	}
 
-        defer f.Close()
+	defer f.Close()
 
 	if opt == 1 {
-        	f.WriteString("[]")
+		f.WriteString("[]")
 	} else if opt == 2 {
 		f.WriteString("[2398795950_u32]")
+	} else if opt == 3 {
+		f.WriteString("[49150]")
 	}
 }
