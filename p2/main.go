@@ -150,7 +150,8 @@ func main() {
 			}
 
 			fmt.Print(boot)
-		} else if scanner.Text() == "c" {
+		}
+		if scanner.Text() == "c" {
 			path = filepath.Join("src", "fw", "block-proto")
 			clear(path, 1)
 			path = filepath.Join("src", "fw", "block-ip")

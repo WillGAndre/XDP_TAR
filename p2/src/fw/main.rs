@@ -78,3 +78,28 @@ fn get_sport(ctx: &XdpContext) -> Result<u16, Error> {
     }
     return Ok(65353)
 }
+
+fn get_tcp_flags(ctx: &XdpContext) -> Result<[u16; 8], Error> {
+    let mut res = [0u16; 8];
+    if let Ok(transort) = ctx.transort() {
+        match transort {
+            Transport::TCP(tcphdr) => {
+                unsafe {
+                    res[0] = ( (*tcphdr).res1() as u16 );
+                    res[1] = ( (*tcphdr).doff() as u16 );
+                    res[2] = ( (*tcphdr).fin() as u16 );
+                    res[3] = ( (*tcphdr).syn() as u16 );
+                    res[4] = ( (*tcphdr).rst() as u16 );
+                    res[5] = ( (*tcphdr).psh() as u16 );
+                    res[6] = ( (*tcphdr).ack() as u16 );
+                    res[7] = ( (*tcphdr).urg() as u16 );
+                }
+            },
+            Transport::UDP(udphdr) => {
+
+            },
+        }
+    }
+
+    Ok(res)
+}
