@@ -33,7 +33,7 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
     let ports = include!("block-port");
     if let Ok(sport) = get_sport(&ctx) {
         for port in ports {
-            if port == sport {
+            if (port as u16) == sport {
                 return Ok(XDP_DROP)
             }
         }
@@ -74,7 +74,7 @@ fn get_ip_saddr(ctx: &XdpContext) -> Result<u32, Error> {
 
 fn get_sport(ctx: &XdpContext) -> Result<u16, Error> {
     if let Ok(transport) = ctx.transport() {
-        return Ok(transport.source)
+        return Ok(transport.source())
     }
-    return Ok(49150)
+    return Ok(65353)
 }

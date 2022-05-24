@@ -182,6 +182,6 @@ func clear(path string, opt int) {
 	} else if opt == 2 {
 		f.WriteString("[2398795950_u32]")
 	} else if opt == 3 {
-		f.WriteString("[49150]")
+		f.WriteString("[80]")
 	}
 }
