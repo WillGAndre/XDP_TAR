@@ -54,8 +54,7 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
     }
 
     // Block TCP Flags
-    /*
-    let mut block_tcp_flags = [0u16; 8];
+    let block_tcp_flags = include!("block-tcp-flags");
     let mut index = 0;
     if let Ok(tcp_flags) = get_tcp_flags(&ctx) {
         while index < 8 {
@@ -67,7 +66,6 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
             index += 1;
         }
     }
-    */
 
     return Ok(XDP_PASS);
 }
