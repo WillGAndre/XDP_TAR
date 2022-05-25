@@ -19,8 +19,10 @@ func main() {
 		"\t[2] Block by ipv4" +
 		"\t\t -> Ips must follow CIDR notation\n" +
 		"\t[3] Block by port\n" +
+		"\t[4] Block by TCP flag\n" +
 		"" +
-		"\n\t[c] clear\n" +
+		"\n" +
+		"\t[c] clear\n" +
 		"\t[q] quit\n" +
 		"" +
 		"" +
@@ -151,6 +153,40 @@ func main() {
 
 			fmt.Print(boot)
 		}
+		if scanner.Text() == "4" {
+			path = filepath.Join("src", "fw", "block-tcp-flags")
+			os.Truncate(path, 0)
+			f, err := os.Create(path)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			defer f.Close()
+
+			text = "Set TCP flag:\n" +
+				"\tflags: res1 doff fin syn rst psh ack urg"
+			fmt.Println(text)
+			for scanner.Scan() {
+				if scanner.Text() != "\n" {
+					f_res := "["
+					flags := scanner.Text()
+					flags_split := strings.Split(flags, " ")
+					flags_res := set_flags(flags_split)
+					for i, r := range flags_res {
+						f_res += strconv.Itoa(r)
+						if i+1 != len(flags_res) {
+							f_res += ", "
+						}
+					}
+					f_res += "]"
+					f.WriteString(f_res)
+					break
+				}
+			}
+
+			fmt.Print(boot)
+		}
 		if scanner.Text() == "c" {
 			path = filepath.Join("src", "fw", "block-proto")
 			clear(path, 1)
@@ -185,4 +221,25 @@ func clear(path string, opt int) {
 	} else if opt == 3 {
 		f.WriteString("[80]")
 	}
+}
+
+func set_flags(flags []string) []int {
+	res := []int{0, 0, 0, 0, 0, 0, 0, 0}
+	for _, flag := range flags {
+		i := contains(flag)
+		if i != -1 {
+			res[i] = 1
+		}
+	}
+	return res
+}
+
+func contains(query string) int {
+	const_flags := []string{"res1", "doff", "fin", "syn", "rst", "psh", "ack", "urg"}
+	for i, flag := range const_flags {
+		if flag == query {
+			return i
+		}
+	}
+	return -1
 }
