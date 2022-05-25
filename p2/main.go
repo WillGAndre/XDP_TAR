@@ -14,7 +14,14 @@ import (
 // IPv4 integer conv source: http://www.aboutmyip.com/AboutMyXApp/IP2Integer.jsp?ipAddress=142.250.184.174
 
 func main() {
-	boot := "Create xdp config files:\n" +
+	boot := "Blocker:\n" +
+		"\t[b] build\n" +
+		"\t[l] load" +
+		"\t\t\t -> hardcoded to: enp0s10\n" +
+		"\n" +
+		"\t--------\n" +
+		"\n" +
+		"Create config files:\n" +
 		"\t[1] Block by protocol" +
 		"\t\t -> Protocols must follow nomenclature as stated in: redbpf_probes::bindings::IPPROTO_\n" +
 		"\t[2] Block by ipv4" +
@@ -24,6 +31,8 @@ func main() {
 		"" +
 		"\n" +
 		"\t[c] clear\n" +
+		"\n" +
+		"\n" +
 		"\t[q] quit\n" +
 		"" +
 		"" +
@@ -189,13 +198,27 @@ func main() {
 			fmt.Print(boot)
 		}
 		if scanner.Text() == "b" {
-			build := exec.Command("sudo cargo", "bpf", "build")
+			build := exec.Command("sudo", "cargo", "bpf", "build")
 			out, err := build.Output()
 
 			if err != nil {
 				log.Fatal(err)
 			}
 
+			fmt.Print(string(out))
+			fmt.Print("\n")
+			fmt.Print(boot)
+		}
+		if scanner.Text() == "l" {
+			// fmt.Println("Interface: ")
+			// itf := scanner.Text()
+			load := exec.Command("sudo", "cargo", "bpf", "load", "-i", "enp0s10", "target/bpf/programs/fw/fw.elf")
+			out, err := load.Output()			
+
+			if err != nil {
+				log.Fatal(err)
+			}			
+			
 			fmt.Print(string(out))
 			fmt.Print("\n")
 			fmt.Print(boot)

@@ -16,10 +16,6 @@ const XDP_DROP: XdpAction = XdpAction::Drop;
 
 // * --- *
 
-/*
-    TODO: Add TCP Flags filter (get_tcp_flags)
-*/
-
 // XDP/eBPF based IP-layer firewall to drop all UDP packets.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
