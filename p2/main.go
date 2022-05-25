@@ -194,6 +194,8 @@ func main() {
 			clear(path, 2)
 			path = filepath.Join("src", "fw", "block-port")
 			clear(path, 3)
+			path = filepath.Join("src", "fw", "block-tcp-flags")
+			clear(path, 4)
 
 			fmt.Print(boot)
 		}
@@ -220,6 +222,8 @@ func clear(path string, opt int) {
 		f.WriteString("[2398795950_u32]")
 	} else if opt == 3 {
 		f.WriteString("[80]")
+	} else if opt == 4 {
+		f.WriteString("[0,0,0,0,0,0,0,0]")
 	}
 }
 
