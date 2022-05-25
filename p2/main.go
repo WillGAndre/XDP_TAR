@@ -210,18 +210,22 @@ func main() {
 			fmt.Print(boot)
 		}
 		if scanner.Text() == "l" {
-			// fmt.Println("Interface: ")
-			// itf := scanner.Text()
-			load := exec.Command("sudo", "cargo", "bpf", "load", "-i", "enp0s10", "target/bpf/programs/fw/fw.elf")
-			out, err := load.Output()			
+			fmt.Println("Interface: ")
+			for scanner.Scan() {
+				if scanner.Text() != "\n" {
+					itf := scanner.Text()
+					load := exec.Command("sudo", "cargo", "bpf", "load", "-i", itf, "target/bpf/programs/fw/fw.elf")
+					out, err := load.Output()
 
-			if err != nil {
-				log.Fatal(err)
-			}			
-			
-			fmt.Print(string(out))
-			fmt.Print("\n")
-			fmt.Print(boot)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					fmt.Print(string(out))
+					fmt.Print("\n")
+					fmt.Print(boot)
+				}
+			}
 		}
 		if scanner.Text() == "c" {
 			path = filepath.Join("src", "fw", "block-proto")
