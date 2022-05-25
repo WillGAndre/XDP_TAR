@@ -53,6 +53,22 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
         }
     }
 
+    // Block TCP Flags
+    /*
+    let mut block_tcp_flags = [0u16; 8];
+    let mut index = 0;
+    if let Ok(tcp_flags) = get_tcp_flags(&ctx) {
+        while index < 8 {
+            if block_tcp_flags[index] != 0 {
+                if block_tcp_flags[index] == tcp_flags[index] {
+                    return Ok(XDP_DROP)
+                }
+            }
+            index += 1;
+        }
+    }
+    */
+
     return Ok(XDP_PASS);
 }
 
@@ -85,22 +101,21 @@ fn get_sport(ctx: &XdpContext) -> Result<u16, Error> {
 
 fn get_tcp_flags(ctx: &XdpContext) -> Result<[u16; 8], Error> {
     let mut res = [0u16; 8];
-    if let Ok(transort) = ctx.transort() {
+    if let Ok(transort) = ctx.transport() {
         match transort {
             Transport::TCP(tcphdr) => {
                 unsafe {
-                    res[0] = ( (*tcphdr).res1() as u16 );
-                    res[1] = ( (*tcphdr).doff() as u16 );
-                    res[2] = ( (*tcphdr).fin() as u16 );
-                    res[3] = ( (*tcphdr).syn() as u16 );
-                    res[4] = ( (*tcphdr).rst() as u16 );
-                    res[5] = ( (*tcphdr).psh() as u16 );
-                    res[6] = ( (*tcphdr).ack() as u16 );
-                    res[7] = ( (*tcphdr).urg() as u16 );
+                    res[0] = (*tcphdr).res1() as u16;
+                    res[1] = (*tcphdr).doff() as u16;
+                    res[2] = (*tcphdr).fin() as u16;
+                    res[3] = (*tcphdr).syn() as u16;
+                    res[4] = (*tcphdr).rst() as u16;
+                    res[5] = (*tcphdr).psh() as u16;
+                    res[6] = (*tcphdr).ack() as u16;
+		            res[7] = (*tcphdr).urg() as u16;
                 }
             },
-            Transport::UDP(udphdr) => {
-
+            Transport::UDP(_udphdr) => {
             },
         }
     }

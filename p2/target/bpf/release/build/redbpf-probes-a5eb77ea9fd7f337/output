@@ -8,6 +8,6 @@ cargo:rerun-if-changed=include/xdp.h
 cargo:rerun-if-env-changed=KERNEL_SOURCE
 cargo:rerun-if-env-changed=KERNEL_VERSION
 cargo:rerun-if-env-changed=REDBPF_VMLINUX
-[2mMay 24 21:21:01.174[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with pre-installed kernel headers
-[2mMay 24 21:21:01.174[0m [33m WARN[0m build_script_build: error on generate_bindings_kernel_headers: error on Builder::get_builder_kernel_headers: kernel headers not found
-[2mMay 24 21:21:01.174[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with vmlinux
+[2mMay 25 20:49:58.233[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with pre-installed kernel headers
+[2mMay 25 20:49:58.233[0m [33m WARN[0m build_script_build: error on generate_bindings_kernel_headers: error on Builder::get_builder_kernel_headers: kernel headers not found
+[2mMay 25 20:49:58.233[0m [34mDEBUG[0m build_script_build: Try generating rust bindings with vmlinux
