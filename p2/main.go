@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -185,6 +186,18 @@ func main() {
 				}
 			}
 
+			fmt.Print(boot)
+		}
+		if scanner.Text() == "b" {
+			build := exec.Command("sudo cargo", "bpf", "build")
+			out, err := build.Output()
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Print(string(out))
+			fmt.Print("\n")
 			fmt.Print(boot)
 		}
 		if scanner.Text() == "c" {
