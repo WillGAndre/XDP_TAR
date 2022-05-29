@@ -14,7 +14,14 @@ import (
 // IPv4 integer conv source: http://www.aboutmyip.com/AboutMyXApp/IP2Integer.jsp?ipAddress=142.250.184.174
 
 func main() {
-	boot := "Blocker:\n" +
+	echo_srv := "Echo Replier:\n" +
+		"\t[le] load echo server\n" +
+		"\t[d]  detach xdp prog\n" +
+		"\n" +
+		"\t--------\n" +
+		"\n"
+	boot := echo_srv +
+		"Blocker:\n" +
 		"\t[b] build\n" +
 		"\t[l] load" +
 		"\t\t\t -> ex: enp0s10\n" +
@@ -231,6 +238,7 @@ func main() {
 			}
 		}
 		if scanner.Text() == "le" {
+			fmt.Println("make..")
 			make_echo := exec.Command("sudo", "make", "-C", "xdp-redirect-src/")
 			out, err := make_echo.Output()
 
@@ -239,7 +247,6 @@ func main() {
 				fmt.Print(string(out))
 				break
 			}
-			fmt.Println("Running make..")
 
 			fmt.Println("Interface: ")
 			for scanner.Scan() {
@@ -255,17 +262,40 @@ func main() {
 					}
 
 					fmt.Println(string(out))
+					
+					fmt.Println("For stats RUN: sudo xdp-redirect-src/xdp_stats -d "+itf)
+					break
+				}
+			}
 
-					run_stats := exec.Command("sudo", "xdp-redirect-src/xdp_loader", "-d", itf)
-					out, err = run_stats.Output()
+			fmt.Print("\n\n\n")
+			fmt.Print(boot)
+		}
+		if scanner.Text() == "d" {
+			make_clean := exec.Command("sudo", "make", "clean", "-C", "xdp-redirect-src/")
+			_, err := make_clean.Output()
+
+			if err != nil {
+				log.Fatal(err)
+				break
+			}
+
+			fmt.Println("Interface: ")
+			for scanner.Scan() {
+				if scanner.Text() != "\n" {
+					itf := scanner.Text()
+					detach := exec.Command("sudo", "ip", "link", "set", "dev", itf, "xdp", "off")
+					_, err = detach.Output()
 
 					if err != nil {
 						log.Fatal(err)
-						fmt.Print(string(out))
 						break
 					}
+					fmt.Println("Detached XDP echo prog")
+					break
 				}
 			}
+			fmt.Print(boot)
 		}
 		if scanner.Text() == "c" {
 			path = filepath.Join("src", "fw", "block-proto")
