@@ -203,6 +203,8 @@ func main() {
 
 			if err != nil {
 				log.Fatal(err)
+				fmt.Print(string(out))
+				break
 			}
 
 			fmt.Print(string(out))
@@ -219,11 +221,49 @@ func main() {
 
 					if err != nil {
 						log.Fatal(err)
+						break
 					}
 
 					fmt.Print(string(out))
 					fmt.Print("\n")
 					fmt.Print(boot)
+				}
+			}
+		}
+		if scanner.Text() == "le" {
+			make_echo := exec.Command("sudo", "make", "-C", "xdp-redirect-src/")
+			out, err := make_echo.Output()
+
+			if err != nil {
+				log.Fatal(err)
+				fmt.Print(string(out))
+				break
+			}
+			fmt.Println("Running make..")
+
+			fmt.Println("Interface: ")
+			for scanner.Scan() {
+				if scanner.Text() != "\n" {
+					itf := scanner.Text()
+					run_sec := exec.Command("sudo", "xdp-redirect-src/xdp_loader", "-d", itf, "--filename", "xdp-redirect-src/xdp_prog_kern.o")
+					out, err = run_sec.Output()
+
+					if err != nil {
+						log.Fatal(err)
+						fmt.Print(string(out))
+						break
+					}
+
+					fmt.Println(string(out))
+
+					run_stats := exec.Command("sudo", "xdp-redirect-src/xdp_loader", "-d", itf)
+					out, err = run_stats.Output()
+
+					if err != nil {
+						log.Fatal(err)
+						fmt.Print(string(out))
+						break
+					}
 				}
 			}
 		}
