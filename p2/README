@@ -4,20 +4,27 @@ NOTE: Go script only tested on Fedora 35
 
 ---
 
-Fedora deps:
+FEDORA DEPS STEPS BY INDEX: (i)
+
+Fedora deps: (1)
  sudo dnf install -y bison cmake ethtool flex git iperf libstdc++-static \
   python-netaddr python-pip gcc gcc-c++ make zlib-devel \
   elfutils-libelf-devel python-cachetools
 
-  Install binary clang:
+  Install binary clang: (2)
     sudo dnf install -y clang clang-devel llvm llvm-devel llvm-static ncurses-devel libbpf
   
-  > Install kernel-headers if needed <
+  > Install kernel-headers if needed < (3)
+
+---
+
+  > (4)
+    sudo dnf install -y cargo go
 
 ---
 
 RUST BLACKLIST:
-  INSTALL BPF:
+  INSTALL BPF: (5)
     sudo cargo install cargo-bpf --no-default-features --features=llvm13,command-line
 
   BUILD / GEN ELF:
@@ -25,6 +32,11 @@ RUST BLACKLIST:
 
   LOAD XDP PROG:
     sudo cargo bpf load -i enp0s9 target/bpf/programs/fw/fw.elf
+
+---
+
+FIREWALL CLI: (6)
+  go run main.go
 
 ---
 

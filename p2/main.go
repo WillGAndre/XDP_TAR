@@ -262,8 +262,8 @@ func main() {
 					}
 
 					fmt.Println(string(out))
-					
-					fmt.Println("For stats RUN: sudo xdp-redirect-src/xdp_stats -d "+itf)
+
+					fmt.Println("For stats RUN: sudo xdp-redirect-src/xdp_stats -d " + itf)
 					break
 				}
 			}
