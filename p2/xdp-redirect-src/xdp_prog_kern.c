@@ -16,23 +16,25 @@
 #include "common/xdp_stats_kern_user.h"
 #include "common/xdp_stats_kern.h"
 
-#ifndef memcpy
-#define memcpy(dest, src, n) __builtin_memcpy((dest), (src), (n))
-#endif
+// Calc new checksum (source: xdp-project/xdp-tutorial)
+static __always_inline __u16 csum_fold_helper(__u32 csum) {
+        __u32 sum;
+        sum = (csum >> 16) + (csum & 0xffff);
+        sum += (sum >> 16);
+        return ~sum;
+}
 
-struct bpf_map_def SEC("maps") tx_port = {
-	.type = BPF_MAP_TYPE_DEVMAP,
-	.key_size = sizeof(int),
-	.value_size = sizeof(int),
-	.max_entries = 256,
-};
+// Sizes should be multiple of 4 , due to 32-bit words
+static __always_inline __u16 icmp_checksum_diff(
+                __u16 seed,
+                struct icmphdr_common *icmphdr_new,
+                struct icmphdr_common *icmphdr_old) {
+        __u32 csum, size = sizeof(struct icmphdr_common);
 
-struct bpf_map_def SEC("maps") redirect_params = {
-	.type = BPF_MAP_TYPE_HASH,
-	.key_size = ETH_ALEN,
-	.value_size = ETH_ALEN,
-	.max_entries = 1,
-};
+        csum = bpf_csum_diff((__be32 *)icmphdr_old, size, (__be32 *)icmphdr_new, size, seed);
+        return csum_fold_helper(csum);
+}
+
 
 SEC("xdp_icmp_echo")
 int xdp_icmp_echo_server(struct xdp_md *ctx) {
@@ -86,40 +88,15 @@ int xdp_icmp_echo_server(struct xdp_md *ctx) {
 	swap_src_dst_mac(eth);
 	old_csum = icmphdr_res->cksum;
 	icmphdr_res->cksum = 0;
-	icmphdr_old = *icmphdr;
+	icmphdr_old = *icmphdr_res;
 	icmphdr_res->type = echo_reply;
 	// Get new checksum, source from assignment resolutions
-	icmphdr_res->cksum = icmp_checksum_diff(~old_csum, icmphdr, &icmphdr_old);
+	icmphdr_res->cksum = icmp_checksum_diff(~old_csum, icmphdr_res, &icmphdr_old);
 
 	action = XDP_TX;
 
 out:
 	return xdp_stats_record_action(ctx, action);
 }
-
-// Calc new checksum (source: xdp-project/xdp-tutorial)
-static __always_inline __u16 csum_fold_helper(__u32 csum) {
-	__u32 sum;
-	sum = (csum >> 16) + (csum & 0xffff);
-	sum += (sum >> 16);
-	return ~sum;
-}
-
-// Sizes should be multiple of 4 , due to 32-bit words 
-static __always_inline __u16 icmp_checksum_diff(
-		__u16 seed,
-		struct icmphdr_common *icmphdr_new,
-		struct icmphdr_common *icmphdr_old) {
-	__u32 csum, size = sizeof(struct icmphdr_common);
-
-	csum = bpf_csum_diff((__be32 *)icmphdr_old, size, (__be32 *)icmphdr_new, size, seed);
-	return csum_fold_helper(csum);
-}
-
-#undef AF_INET
-#define AF_INET 2
-#undef AF_INET6
-#define AF_INET6 10
-#define IPV6_FLOWINFO_MASK bpf_htonl(0x0FFFFFFF)
 
 char _license[] SEC("license") = "GPL";

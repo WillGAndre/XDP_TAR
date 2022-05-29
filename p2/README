@@ -6,7 +6,7 @@ Fedora deps:
   elfutils-libelf-devel python-cachetools
 
 Install binary clang:
- sudo dnf install -y clang clang-devel llvm llvm-devel llvm-static ncurses-devel
+ sudo dnf install -y clang clang-devel llvm llvm-devel llvm-static ncurses-devel libbpf
 
  > Install kernel-headers if needed <
 
