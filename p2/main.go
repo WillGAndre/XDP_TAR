@@ -17,7 +17,7 @@ func main() {
 	boot := "Blocker:\n" +
 		"\t[b] build\n" +
 		"\t[l] load" +
-		"\t\t\t -> hardcoded to: enp0s10\n" +
+		"\t\t\t -> ex: enp0s10\n" +
 		"\n" +
 		"\t--------\n" +
 		"\n" +
