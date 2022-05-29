@@ -6,7 +6,7 @@ use core::{str, mem};
 use core::str::*;
 use core::convert::TryInto;
 use cty::*;
-use redbpf_probes::xdp::DevMap;
+use redbpf_probes::maps::PerCpuArray;
 use redbpf_probes::xdp::prelude::*;
 use redbpf_probes::bindings::*;
 
@@ -19,12 +19,7 @@ const XDP_TX: XdpAction = XdpAction::Tx;
 
 // * --- *
 
-#[map]
-static mut map: DevMap = DevMap::with_max_entries(2);
-
-// * --- *
-
-// XDP/eBPF based IP-layer firewall to drop all UDP packets.
+// XDP/eBPF based IP-layer firewall.
 #[xdp]
 pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
     let data = ctx.data_start();
@@ -39,28 +34,11 @@ pub fn xdp_ip_firewall(ctx: XdpContext) -> XdpResult {
         return Ok(XDP_DROP)
     }
     
-    /*
-    unsafe {
-        if let Ok(_) = map.redirect(2 as u32) {
-            return Ok(XDP_REDIRECT)
-        }
-    }
-    */
-
     // Blacklist ips
     let ips = include!("block-ip");
     if let Ok(ip_saddr) = get_ip_saddr(&ctx) {
         for ip in ips {
             if ip_saddr == ip.to_be() {
-                /*
-                unsafe {
-                    if let Ok(_) = map.redirect(1) {
-                        return Ok(XDP_REDIRECT)
-                    }
-                    // return Ok(bpf_redirect((*ctx_xdp_md).ingress_ifindex as u32, 0));
-                }
-                */
-                // return Ok(XDP_REDIRECT)
                 return Ok(XDP_DROP)
             }
         }  
